@@ -24,16 +24,12 @@ def ChatModal(prompt):
     global Reference
     try:
         Reference.chat_str += f"Aristo: {prompt}\nUser: "
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-instruct",
+        response = openai.Completion.create(
+            engine="text-davinci-002",  # Specify GPT-3 model
             prompt=Reference.chat_str,
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt},
-            ],
         )
-        Reference.chat_str += f"{response['choices'][0]['message']['content']}"
-        return response['choices'][0]['message']['content']
+        Reference.chat_str += f"{response['choices'][0]['text']}"
+        return response['choices'][0]['text']
     except openai.error.OpenAIError as e:
         error_message = "I'm currently experiencing some issues. Please try again later."
         print(f"OpenAI Error: {e}")
@@ -46,14 +42,8 @@ def welcome(message):
     Handler to welcome the user and clear past conversation and context.
     """
     clear_past()
-    welcome_message = "Hello! You're welcome, I'm a Student bot created by Aristocrat. How may I help you today? \n\n" \
-                      "You can use the following commands:\n" \
-                      "/clear - to clear the past conversation and context\n" \
-                      "/help - to get this help menu\n" \
-                      "/menu - to see the menu\n" \
-                      "/about_developer - to know about the developer\n" \
-                      "/feedback - to provide feedback\n" \
-                      "/buycoffee - to buy a coffee for the developer"
+    welcome_message = "👋 Hello! You're welcome, I'm a Student bot created by Aristocrat. How may I help you today? \n\n" \
+                
     bot.reply_to(message, welcome_message)
 
 @bot.message_handler(commands=['clear'])
@@ -62,7 +52,7 @@ def clear(message):
     Handler to clear the previous conversation and context.
     """
     clear_past()
-    bot.reply_to(message, "Cleared the past context and chat buddy!")
+    bot.reply_to(message, "🗑️ Cleared the past context and chat buddy!")
 
 @bot.message_handler(commands=['help'])
 def helper(message):
@@ -70,37 +60,39 @@ def helper(message):
     Handler to display the help menu.
     """
     help_command = (
-        "➡️Hi there, I'm chatGPT bot created by Aristocrat! Please follow these commands:\n"
-        "➡️/start - to start the conversation\n"
-        "➡️/clear - to clear the past conversation and context\n"
-        "➡️/help - to get this help menu\n"
-        "➡️/menu - to see the menu\n"
-        "➡️/about_developer - to know about the developer\n"
-        "➡️/feedback - to provide feedback\n"
-        "➡️/buycoffee - to buy a coffee for the developer"
+        "➡️ Hi there, I'm chatGPT bot created by Aristocrat! Please follow these commands:\n"
+        "➡️ /start - to start the conversation\n"
+        "➡️ /clear - to clear the past conversation and context\n"
+        "➡️ /help - to get this help menu\n"
+        "➡️ /menu - to see the menu\n"
+        "➡️ /about_developer - to know about the developer\n"
+        "➡️ /feedback - to provide feedback\n"
+        "➡️ /buycoffee - to buy a coffee for the developer"
     )
     bot.reply_to(message, help_command)
 
-@bot.message_handler(commands=['about_developer'])
-def about_developer(message):
+@bot.message_handler(commands=['about'])
+def about_bot(message):
     """
-    Handler to provide information about the developer.
+    Handler to provide information about the bot and its creator.
     """
-    developer_info = "👨‍💻 **About the Developer**\n\n" \
-                     "Hello! I am Aristocrat, the developer of this chatGPT bot. I'm passionate about " \
-                     "creating interesting and helpful projects. If you have any questions or suggestions, " \
-                     "feel free to reach out!\n\n" \
-                     "📧 **Contact Information:**\n" \
-                     "Email: ayimobuobi@gmail.com\n" \
-                     "GitHub: [github.com/aristocratjnr](https://github.com/aristocratjnr)"
-    bot.reply_to(message, developer_info, parse_mode='Markdown', disable_web_page_preview=True)
+    bot_info = (
+        "🤖 **About AristoAi Bot**\n\n"
+        "Hello! I am AristoAi, a chatbot created by Aristocrat. I am designed to assist students in their research purposes. "
+        "Feel free to ask me questions or seek help with your studies!\n\n"
+        "👨‍💻 **About the Developer**\n\n" 
+        "Aristocrat is a level 300 student pursuing a Bachelor of Science in Information Technology. "
+        "I created this bot to aid fellow students in their academic endeavors through my Telegram bot.\n\n"
+        "If you have any questions or suggestions, feel free to reach out!"
+    )
+    bot.reply_to(message, bot_info, parse_mode='Markdown')
 
 @bot.message_handler(commands=['feedback'])
 def feedback(message):
     """
     Handler to collect user feedback.
     """
-    bot.reply_to(message, "We appreciate your feedback! Please type your feedback, and we'll take it into account.")
+    bot.reply_to(message, "📣 We appreciate your feedback! Please type your feedback, and we'll take it into account.")
 
 @bot.message_handler(commands=['buycoffee'])
 def buy_coffee(message):
@@ -116,16 +108,16 @@ def buy_coffee(message):
 @bot.message_handler(commands=['contact'])
 def contact_handler(message):
     contact_info = (
-        "Contact Developer:\n"
+        "📞 **Contact Developer**:\n"
         "📧 Email: ayimobuobi@gmail.com\n"
-        "🔗 GitHub: https://github.com/Aristocratjnr\n"
-        "💼 LinkedIn: https://www.linkedin.com/in/obuobi-david-ayim-b40a18241/\n"
-        "💬 Telegram: @aristocratjnr\n"
+        "🔗 GitHub: [github.com/Aristocratjnr](https://github.com/Aristocratjnr)\n"
+        "💼 LinkedIn: [linkedin.com/in/obuobi-david-ayim-b40a18241](https://www.linkedin.com/in/obuobi-david-ayim-b40a18241/)\n"
+        "💬 Telegram: @aristocratjnr"
     )
-    bot.reply_to(message, contact_info)
+    bot.reply_to(message, contact_info, parse_mode='Markdown')
 
 # ChatGPT message handler
-@bot.message_handler(func=lambda m: True)
+@bot.message_handler(func=lambda m: True) 
 def chatgpt(message):
     """
     Handler to process the user's input and generate a response using the ChatModal function.
@@ -145,7 +137,7 @@ def chatgpt(message):
     if response:
         bot.reply_to(message, response)
     else:
-        bot.reply_to(message, "I'm sorry, I didn't understand that. Can you please ask in a different way?")
+        bot.reply_to(message, "🤔 I'm sorry, I didn't understand that. Can you please ask in a different way?")
 
 # Function to clear the previous conversation and context
 def clear_past():
