@@ -1,38 +1,43 @@
-import os
-from dotenv import load_dotenv
 from telebot import TeleBot
-import openai
-import time
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from dotenv import load_dotenv
+import os
 
 # Load environment variables
 load_dotenv()
-
-# Set OpenAI API key
-OPENAI_KEY = os.getenv("OPENAI_KEY")
-openai.api_key = OPENAI_KEY
-
-# Create a reference object to store the chat string and current model
-class Reference:
-    chat_str = ""
 
 # Initialize bot
 TOKEN = os.getenv("BOT_TOKEN")
 bot = TeleBot(token=TOKEN)
 
-# Function to interact with OpenAI API using ChatModal
+# Initialize MistralAI Mixtral model and tokenizer
+model_id = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id, device_map={"cuda": 0})
+
+# Create a reference object to store the chat string
+class Reference:
+    chat_str = ""
+
+# Function to interact with MistralAI Mixtral model using ChatModal
 def ChatModal(prompt):
     global Reference
     try:
         Reference.chat_str += f"Aristo: {prompt}\nUser: "
-        response = openai.Completion.create(
-            model="text-davinci-003",  # Specify davinci model
-            prompt=Reference.chat_str,
-            max_tokens=150,  # Adjust as needed
-        )
-        Reference.chat_str += f"{response['choices'][0]['text']}"
-        return response['choices'][0]['text']
-    except openai.error.OpenAIError as e:
-        error_message = f"OpenAI Error: {e}"
+        
+        # Encode messages using the MistralAI Mixtral tokenizer
+        inputs = tokenizer(Reference.chat_str, return_tensors="pt", max_length=1024, truncation=True)
+        
+        # Generate a response from the MistralAI Mixtral model
+        outputs = model.generate(**inputs, max_length=300, num_beams=5, no_repeat_ngram_size=2, top_k=50, top_p=0.95, temperature=0.7)
+        
+        # Decode the response
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        
+        Reference.chat_str += response
+        return response
+    except Exception as e:
+        error_message = f"MistralAI Mixtral Error: {e}"
         print(error_message)
         return error_message
 
@@ -61,14 +66,14 @@ def helper(message):
     Handler to display the help menu.
     """
     help_command = (
-        "➡️ Hi there, I'm chatGPT bot created by Aristocrat! Please follow these commands:\n"
+        "➡️ Hi there, I'm AristoAi! Please follow these commands:\n"
         "➡️ /start - to start the conversation\n"
         "➡️ /clear - to clear the past conversation and context\n"
         "➡️ /help - to get this help menu\n"
-        "➡️ /menu - to see the menu\n"
-        "➡️ /about_developer - to know about the developer\n"
+        "➡️ /about - to know about the bot and developer\n"
         "➡️ /feedback - to provide feedback\n"
-        "➡️ /buycoffee - to buy a coffee for the developer"
+        "➡️ /buycoffee - to buy a coffee for the developer\n"
+        "➡️ /contact - to contact the developer"
     )
     bot.reply_to(message, help_command)
 
@@ -89,14 +94,14 @@ def about_bot(message):
     bot.reply_to(message, bot_info, parse_mode='Markdown')
 
 @bot.message_handler(commands=['feedback'])
-def feedback(message):
+def feedback_handler(message):
     """
     Handler to collect user feedback.
     """
     bot.reply_to(message, "📣 We appreciate your feedback! Please type your feedback, and we'll take it into account.")
 
 @bot.message_handler(commands=['buycoffee'])
-def buy_coffee(message):
+def buy_coffee_handler(message):
     """
     Handler to allow users to buy a coffee for the developer.
     """
@@ -105,9 +110,11 @@ def buy_coffee(message):
                      "Momo: 0551784926"
     bot.reply_to(message, coffee_message)
 
-# Add this handler for the /contact command
 @bot.message_handler(commands=['contact'])
 def contact_handler(message):
+    """
+    Handler to provide contact information for the developer.
+    """
     contact_info = (
         "📞 **Contact Developer**:\n"
         "📧 Email: ayimobuobi@gmail.com\n"
@@ -116,6 +123,10 @@ def contact_handler(message):
         "💬 Telegram: @aristocratjnr"
     )
     bot.reply_to(message, contact_info, parse_mode='Markdown')
+
+# Remaining handlers remain the same
+
+# ...
 
 # ChatGPT message handler
 @bot.message_handler(func=lambda m: True) 
@@ -127,7 +138,7 @@ def chatgpt(message):
 
     print(f">>> USER: \n{message.text}")
     
-    # Use ChatModal function to interact with OpenAI API
+    # Use ChatModal function to interact with MistralAI Mixtral model
     response = ChatModal(message.text)
     
     Reference.chat_str += message.text + response
