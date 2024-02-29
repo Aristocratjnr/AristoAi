@@ -25,8 +25,9 @@ def ChatModal(prompt):
     try:
         Reference.chat_str += f"Aristo: {prompt}\nUser: "
         response = openai.Completion.create(
-            engine="text-davinci-002",  # Specify text-embedding-3-small model
+            model="gpt-3.5-turbo",  # Specify gpt-3.5-turbo model
             prompt=Reference.chat_str,
+            max_tokens=150,  # Adjust as needed
         )
         Reference.chat_str += f"{response['choices'][0]['text']}"
         return response['choices'][0]['text']
@@ -34,7 +35,6 @@ def ChatModal(prompt):
         error_message = f"OpenAI Error: {e}"
         print(error_message)
         return error_message
-
 
 # Command handlers
 @bot.message_handler(commands=['start'])
