@@ -25,7 +25,7 @@ def ChatModal(prompt):
     try:
         Reference.chat_str += f"Aristo: {prompt}\nUser: "
         response = openai.Completion.create(
-            model="gpt-3.5-turbo",  # Specify gpt-3.5-turbo model
+            model="text-davinci-003",  # Specify davinci model
             prompt=Reference.chat_str,
             max_tokens=150,  # Adjust as needed
         )
