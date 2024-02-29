@@ -25,15 +25,16 @@ def ChatModal(prompt):
     try:
         Reference.chat_str += f"Aristo: {prompt}\nUser: "
         response = openai.Completion.create(
-            engine="text-davinci-002",  # Specify GPT-3 model
+            engine="text-davinci-002",  # Specify text-embedding-3-small model
             prompt=Reference.chat_str,
         )
         Reference.chat_str += f"{response['choices'][0]['text']}"
         return response['choices'][0]['text']
     except openai.error.OpenAIError as e:
-        error_message = "I'm currently experiencing some issues. Please try again later."
-        print(f"OpenAI Error: {e}")
+        error_message = f"OpenAI Error: {e}"
+        print(error_message)
         return error_message
+
 
 # Command handlers
 @bot.message_handler(commands=['start'])
