@@ -54,10 +54,10 @@ def chat_handler(message):
     elif message.text.startswith('/contact'):
         contact_info = (
             "📞 **Contact Developer**:\n\n"
-            "📧 Email: developer@example.com\n"
+            "📧 Email: ayimobuobi@gmail.com\n"
             "🔗 GitHub: [github.com/developer](https://github.com/developer)\n"
             "💼 LinkedIn: [linkedin.com/in/developer](https://www.linkedin.com/in/developer/)\n"
-            "💬 Telegram: @developer"
+            "💬 Telegram: @aristocratjnr"
         )
         bot.reply_to(message, contact_info, parse_mode='Markdown')
     else:
