@@ -53,9 +53,9 @@ def chat_handler(message):
         bot.reply_to(message, coffee_message)
     elif message.text.startswith('/contact'):
         contact_info = (
-            "📞 **Contact Developer**:\n\n"
+            "📞 Contact Developer:0551784926 \n\n"
             "📧 Email: ayimobuobi@gmail.com\n"
-            "🔗 GitHub: [github.com/developer](https://github.com/developer)\n"
+            "🔗 GitHub: [github.com/developer](https://github.com/aristocratjnr)\n"
             "💼 LinkedIn: [linkedin.com/in/developer](https://www.linkedin.com/in/developer/)\n"
             "💬 Telegram: @aristocratjnr"
         )
