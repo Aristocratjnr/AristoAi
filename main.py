@@ -38,7 +38,7 @@ def chat_handler(message):
             "➡️ /help - Display this help message\n"
             "➡️ /about - Learn more about the bot\n"
             "➡️ /feedback - Provide feedback\n"
-            "➡️ /buycoffee - Buy me a coffee ☕️\n"
+            "➡️ /buycoffee - Buy me a coffee\n"
             "➡️ /contact - Contact the developer"
         )
         bot.reply_to(message, help_message, parse_mode='Markdown')
